@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - CodeGuard{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1><i class="fas fa-home"></i> Dashboard</h1>
+        <button class="btn btn-primary" onclick="showCreateProjectModal()">
+            <i class="fas fa-plus"></i> New Project
+        </button>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon blue">
+                <i class="fas fa-folder"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ stats.total_projects }}</h3>
+                <p>Total Projects</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon green">
+                <i class="fas fa-file-code"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ stats.total_files }}</h3>
+                <p>Files Analyzed</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon orange">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ stats.total_issues }}</h3>
+                <p>Total Issues</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon red">
+                <i class="fas fa-bug"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ stats.critical_issues }}</h3>
+                <p>Critical Issues</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="projects-section">
+        <h2>Your Projects</h2>
+        
+        {% if projects %}
+        <div class="projects-grid">
+            {% for project in projects %}
+            <div class="project-card">
+                <div class="project-header">
+                    <h3>
+                        <i class="fas fa-folder-open"></i>
+                        {{ project.name }}
+                    </h3>
+                    <div class="project-actions">
+                        <a href="{{ url_for('project_detail', project_id=project.id) }}" 
+                           class="btn btn-sm btn-primary">
+                            <i class="fas fa-eye"></i> View
+                        </a>
+                    </div>
+                </div>
+                <p class="project-description">{{ project.description or 'No description provided' }}</p>
+                <div class="project-stats">
+                    <span><i class="fas fa-file"></i> {{ project.files|length }} files</span>
+                    <span><i class="fas fa-bug"></i> 
+                        {% set issue_count = namespace(total=0) %}
+                        {% for file in project.files %}
+                            {% set issue_count.total = issue_count.total + file.issues|length %}
+                        {% endfor %}
+                        {{ issue_count.total }} issues
+                    </span>
+                </div>
+                <div class="project-footer">
+                    <small><i class="fas fa-clock"></i> Created {{ project.created_at.strftime('%Y-%m-%d') }}</small>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-folder-open"></i>
+            <h3>No Projects Yet</h3>
+            <p>Create your first project to start analyzing code</p>
+            <button class="btn btn-primary" onclick="showCreateProjectModal()">
+                <i class="fas fa-plus"></i> Create Project
+            </button>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Create Project Modal -->
+<div id="createProjectModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-folder-plus"></i> Create New Project</h2>
+            <button class="close-modal" onclick="closeCreateProjectModal()">&times;</button>
+        </div>
+        <form method="POST" action="{{ url_for('create_project') }}">
+            <div class="form-group">
+                <label for="project-name">
+                    <i class="fas fa-tag"></i> Project Name
+                </label>
+                <input type="text" id="project-name" name="name" required 
+                       placeholder="Enter project name">
+            </div>
+            <div class="form-group">
+                <label for="project-description">
+                    <i class="fas fa-align-left"></i> Description
+                </label>
+                <textarea id="project-description" name="description" rows="3"
+                          placeholder="Describe your project (optional)"></textarea>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeCreateProjectModal()">
+                    Cancel
+                </button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-check"></i> Create Project
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

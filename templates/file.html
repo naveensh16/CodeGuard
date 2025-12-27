@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}{{ code_file.filename }} - CodeGuard{% endblock %}
+
+{% block content %}
+<div class="file-container">
+    <div class="file-header">
+        <div class="header-left">
+            <a href="{{ url_for('project_detail', project_id=project.id) }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Project
+            </a>
+            <div class="file-title">
+                <h1><i class="fas fa-file-code"></i> {{ code_file.filename }}</h1>
+                <span class="language-badge">{{ code_file.language }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="file-stats-bar">
+        <div class="stat-item">
+            <i class="fas fa-bug"></i>
+            <span>{{ code_file.issues|length }} Total Issues</span>
+        </div>
+        <div class="stat-item critical">
+            <i class="fas fa-exclamation-circle"></i>
+            <span>{{ code_file.issues|selectattr('severity', 'equalto', 'critical')|list|length }} Critical</span>
+        </div>
+        <div class="stat-item high">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span>{{ code_file.issues|selectattr('severity', 'equalto', 'high')|list|length }} High</span>
+        </div>
+        <div class="stat-item medium">
+            <i class="fas fa-info-circle"></i>
+            <span>{{ code_file.issues|selectattr('severity', 'equalto', 'medium')|list|length }} Medium</span>
+        </div>
+    </div>
+
+    <div class="file-content-layout">
+        <div class="code-panel">
+            <div class="code-header">
+                <h3><i class="fas fa-code"></i> Source Code</h3>
+            </div>
+            <div class="code-viewer">
+                <pre><code class="language-{{ code_file.language }}">{% for line in code_file.content.split('\n') %}<span class="line-number" data-line="{{ loop.index }}">{{ '%4d'|format(loop.index) }}</span>{{ line }}
+{% endfor %}</code></pre>
+            </div>
+        </div>
+
+        <div class="issues-panel">
+            <div class="issues-header">
+                <h3><i class="fas fa-list"></i> Issues Found</h3>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="critical">Critical</button>
+                    <button class="filter-btn" data-filter="high">High</button>
+                    <button class="filter-btn" data-filter="medium">Medium</button>
+                    <button class="filter-btn" data-filter="low">Low</button>
+                    <button class="btn btn-primary" onclick="autoFixAll()" style="margin-left: auto;">
+                        <i class="fas fa-magic"></i> Auto-Fix All
+                    </button>
+                </div>
+            </div>
+            
+            <div class="issues-list">
+                {% if code_file.issues %}
+                    {% for issue in code_file.issues|sort(attribute='severity') %}
+                    <div class="issue-card severity-{{ issue.severity }}" data-severity="{{ issue.severity }}" data-line="{{ issue.line_number }}" data-issue-id="{{ issue.id }}">
+                        <div class="issue-header">
+                            <span class="severity-badge {{ issue.severity }}">
+                                {% if issue.severity == 'critical' %}
+                                    <i class="fas fa-exclamation-circle"></i>
+                                {% elif issue.severity == 'high' %}
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                {% elif issue.severity == 'medium' %}
+                                    <i class="fas fa-info-circle"></i>
+                                {% else %}
+                                    <i class="fas fa-check-circle"></i>
+                                {% endif %}
+                                {{ issue.severity|upper }}
+                            </span>
+                            <span class="issue-type">{{ issue.issue_type }}</span>
+                            <span class="issue-source">{{ issue.source }}</span>
+                        </div>
+                        <div class="issue-body">
+                            <div class="issue-line" onclick="highlightLine({{ issue.line_number }})">
+                                <i class="fas fa-map-marker-alt"></i> Line {{ issue.line_number }}
+                            </div>
+                            <p class="issue-message">{{ issue.message }}</p>
+                            {% if issue.suggestion %}
+                            <div class="issue-suggestion">
+                                <i class="fas fa-lightbulb"></i>
+                                <strong>Suggestion:</strong> {{ issue.suggestion }}
+                            </div>
+                            {% endif %}
+                            {% if issue.fixed_code %}
+                            <div class="issue-fix">
+                                <i class="fas fa-code"></i>
+                                <strong>Proposed Fix:</strong>
+                                <pre><code>{{ issue.fixed_code }}</code></pre>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="issue-actions">
+                            {% if issue.fixed_code and issue.status == 'open' %}
+                            <button class="btn btn-sm btn-primary" onclick="applyFix({{ issue.id }})">
+                                <i class="fas fa-magic"></i> Apply Fix
+                            </button>
+                            {% endif %}
+                            <button class="btn btn-sm btn-success" onclick="updateIssueStatus({{ issue.id }}, 'resolved')">
+                                <i class="fas fa-check"></i> Resolve
+                            </button>
+                            <button class="btn btn-sm btn-warning" onclick="updateIssueStatus({{ issue.id }}, 'ignored')">
+                                <i class="fas fa-eye-slash"></i> Ignore
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-check-circle"></i>
+                    <h3>No Issues Found</h3>
+                    <p>This file passed all checks successfully!</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const fileId = {{ code_file.id }};
+</script>
+<script src="{{ url_for('static', filename='js/file.js') }}"></script>
+{% endblock %}

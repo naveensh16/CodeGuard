@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}CodeGuard - Welcome{% endblock %}
+
+{% block content %}
+<div class="landing-page">
+    <div class="hero-section">
+        <div class="hero-content">
+            <h1>
+                <i class="fas fa-shield-alt"></i>
+                CodeGuard
+            </h1>
+            <p class="hero-subtitle">AI-Powered Code Quality & Security Analysis</p>
+            <p class="hero-description">
+                Detect vulnerabilities, improve code quality, and maintain secure codebases with intelligent static analysis and AI-driven insights.
+            </p>
+            <div class="hero-buttons">
+                <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-user-plus"></i> Get Started
+                </a>
+                <a href="{{ url_for('login') }}" class="btn btn-secondary btn-lg">
+                    <i class="fas fa-sign-in-alt"></i> Sign In
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="features-section">
+        <h2>Key Features</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-bug"></i>
+                </div>
+                <h3>Static Analysis</h3>
+                <p>Automated code quality checks with industry-standard tools like Pylint and PMD</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <h3>AI-Powered Insights</h3>
+                <p>Intelligent code review powered by machine learning models</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <h3>Security Scanning</h3>
+                <p>Detect vulnerabilities and security flaws before deployment</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3>Analytics Dashboard</h3>
+                <p>Visualize code health metrics and track improvements over time</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-project-diagram"></i>
+                </div>
+                <h3>Project Workspaces</h3>
+                <p>Organize and manage multiple projects with version tracking</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-lightbulb"></i>
+                </div>
+                <h3>Smart Suggestions</h3>
+                <p>Get actionable recommendations to improve your code</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="tech-stack-section">
+        <h2>Powered By Modern Technology</h2>
+        <div class="tech-badges">
+            <span class="tech-badge">Python</span>
+            <span class="tech-badge">Flask</span>
+            <span class="tech-badge">SQLite</span>
+            <span class="tech-badge">Pylint</span>
+            <span class="tech-badge">OpenAI</span>
+            <span class="tech-badge">JavaScript</span>
+        </div>
+    </div>
+</div>
+{% endblock %}
