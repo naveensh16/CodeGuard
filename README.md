@@ -311,5 +311,3 @@ For issues, questions, or suggestions:
 - Font Awesome for icons
 
 ---
-
-**Made with ❤️ for better code quality**
